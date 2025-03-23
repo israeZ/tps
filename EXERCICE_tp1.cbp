@@ -1,44 +1,238 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<CodeBlocks_project_file>
-	<FileVersion major="1" minor="6" />
-	<Project>
-		<Option title="EXERCICE" />
-		<Option pch_mode="2" />
-		<Option compiler="gcc" />
-		<Build>
-			<Target title="Debug">
-				<Option output="bin/Debug/EXERCICE" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-				</Compiler>
-			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/EXERCICE" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
-			</Target>
-		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-		</Compiler>
-		<Unit filename="1.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Extensions>
-			<lib_finder disable_auto="1" />
-		</Extensions>
-	</Project>
-</CodeBlocks_project_file>
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct noeud{
+int valeur;
+struct noeud *suivant;
+}noeud;
+noeud *cree(int valeur){
+noeud *p=(noeud*)malloc(sizeof(noeud));
+if(!p){
+    return NULL;
+}
+p->valeur=valeur;
+p->suivant=NULL;
+return p;
+}
+void affiche(noeud *debut){
+    noeud*np;
+if(debut==NULL){
+    printf("la liste est vide \n");
+}
+else{
+        np=debut;
+    while(np!=NULL){
+      printf("%d--->",np->valeur);
+      np=np->suivant;
+    }
+    printf("\n");
+}
+}
+noeud *ajouterD(noeud *debut,int valeur){
+noeud*p;
+p=(noeud*)malloc(sizeof(noeud));
+
+if(!p){
+    return NULL;
+}
+p->valeur=valeur;
+p->suivant=NULL;
+
+p->suivant=debut;
+debut=p;
+return debut;
+
+}
+noeud *ajouterF(noeud *debut,int valeur){
+noeud *np,*p;
+p=cree(valeur);
+if(!p){return NULL;}
+if(debut==NULL){
+   debut=p;
+   return debut;
+}
+np=debut;
+while(np->suivant!=NULL){
+ np=np->suivant;
+}
+np->suivant=p;
+return debut;
+}
+int taille(noeud *debut){
+    int i=0;
+if(debut==NULL){
+    printf("la liste est vide \n");
+}
+noeud *np;
+np=debut;
+while(np!=NULL){
+         i++;
+        np=np->suivant;
+
+}
+return i;
+}
+noeud *insertion(noeud *debut,int pos,int valeur){
+    noeud *p=cree(valeur);
+    noeud*np;
+    int t;
+    t=taille(debut);
+    if(pos<1 || pos>=t+1){
+    printf("position invalid");
+    return debut ;}
+    int i=0;
+    if(!p){
+        return NULL;
+    }
+if(debut==NULL){
+    debut=p;
+    return debut;
+}
+if(pos==1){
+    return ajouterD(debut,valeur);
+}
+np=debut;
+for(i=0;np!=NULL&&i<pos-2;i++){
+ np=np->suivant;
+}
+if(np->suivant==NULL){
+    return ajouterF(debut,valeur);
+}
+if(np!=NULL){
+p->suivant=np->suivant;
+np->suivant=p;}
+return debut;
+}
+
+void rechercher(noeud *debut,int valeur){
+noeud *np;
+if(debut==NULL){
+    printf("liste est vide ");
+}
+np=debut;
+while(np!=NULL&&np->valeur!=valeur){
+    np=np->suivant;
+}
+if(np!=NULL){
+    printf("trové");
+}
+}
+noeud *suppressionD(noeud *debut){
+noeud *np;
+if(debut==NULL){
+    printf("liste vide");
+    return ;
+}
+np=debut;
+debut=debut->suivant;
+free(np);
+return debut;
+}
+noeud *suppressionF(noeud *debut){
+noeud *np,*c;
+if(debut==NULL){
+    printf("liste est vide");
+    return;
+}
+np=debut;
+while(np->suivant!=NULL){
+ c=np;
+ np=np->suivant;
+}
+c->suivant=NULL;
+free(np);
+return debut;
+}
+
+noeud *suppressionP(noeud *debut,int pos){
+    noeud *np=NULL,*c;
+    int t=0;
+    t=taille(debut);
+    if(pos<1 || pos>t){
+    printf("position invalid");
+    return debut;}
+    int i=0;
+
+if(debut==NULL){
+    printf("liste est vide");
+    return;
+}
+if(pos==1){
+    return suppressionD(debut);
+}
+np=debut;
+for(i=0;np!=NULL&&i<pos-2;i++){
+ np=np->suivant;
+}
+if(np->suivant==NULL){
+    return suppressionF(debut);
+}
+if(np!=NULL){
+        c=np->suivant;
+np->suivant=c->suivant;
+
+}free(c);
+return debut;
+}
+noeud *modifierD(noeud *debut,int valeur){
+noeud *np=debut;
+
+np->valeur=valeur;
+return debut;
+}
+noeud *modifierF(noeud *debut,int valeur){
+noeud *np=debut;
+while(np->suivant!=NULL){
+    np=np->suivant;
+}
+np->valeur=valeur;
+return debut;
+}
+noeud *modifierP(noeud *debut,int valeur,int pos){
+noeud *np=debut;
+int i;
+if(pos==1){
+    return modifierD(debut,valeur);
+}
+for(i=0;i<pos-1;i++){
+ np=np->suivant;
+}
+if(np->suivant!=NULL){
+    return modifierF(debut,valeur);
+}
+np->valeur=valeur;
+return debut;
+}
+int main()
+{
+noeud *debut=NULL;
+
+debut=ajouterD(debut,5);
+affiche(debut);
+debut=ajouterF(debut,10);
+affiche(debut);
+debut=insertion(debut,2,8);
+affiche(debut);
+suppressionF(debut);
+affiche(debut);
+debut=insertion(debut,2,18);
+affiche(debut);
+debut=insertion(debut,2,19);
+affiche(debut);
+debut=suppressionD(debut);
+affiche(debut);
+debut=suppressionF(debut);
+affiche(debut);
+debut=modifierD(debut,2);
+affiche(debut);
+debut=modifierF(debut,20);
+affiche(debut);
+debut=modifierP(debut,100,2);
+affiche(debut);
+debut=ajouterF(debut,600);
+affiche(debut);
+debut=suppressionP(debut,2);
+affiche(debut);
+    return 0;
+}
+
