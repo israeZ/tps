@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Etudiant {
+    int id;
+    char nom[50];
+    float moyenne;
+    struct Etudiant* suivant;
+    struct Etudiant* precedent;
+} Etudiant;
+
+Etudiant* creer_etudiant() {
+    Etudiant* e = (Etudiant*)malloc(sizeof(Etudiant));
+    printf("donnes id:\n");
+    scanf("%d", &e->id);
+    printf("donne nom:\n");
+    scanf("%s", e->nom);
+    printf("donne moyenne:\n");
+    scanf("%f", &e->moyenne);
+    e->suivant = NULL;
+    e->precedent = NULL;
+    return e;
+}
+
+int longueur(Etudiant* tete) {
+    int c = 0;
+    while (tete) {
+        c++;
+        tete = tete->suivant;
+    }
+    return c;
+}
+
+Etudiant* ajouter_position(Etudiant* tete, Etudiant* nouveau, int position) {
+    if (position < 1 || position > longueur(tete) + 1) return tete;
+    if (position == 1) {
+        nouveau->suivant = tete;
+        if (tete) tete->precedent = nouveau;
+        return nouveau;
+    }
+    Etudiant* temp = tete;
+    for (int i = 1; i < position - 1; i++) temp = temp->suivant;
+    nouveau->suivant = temp->suivant;
+    if (temp->suivant) temp->suivant->precedent = nouveau;
+    temp->suivant = nouveau;
+    nouveau->precedent = temp;
+    return tete;
+}
+
+Etudiant* supprimer_position(Etudiant* tete, int position) {
+    if (position < 1 || position > longueur(tete)) return tete;
+    if (position == 1) {
+        Etudiant* temp = tete;
+        tete = tete->suivant;
+        if (tete) tete->precedent = NULL;
+        free(temp);
+        return tete;
+    }
+    Etudiant* temp = tete;
+    for (int i = 1; i < position; i++) temp = temp->suivant;
+    if (temp->precedent) temp->precedent->suivant = temp->suivant;
+    if (temp->suivant) temp->suivant->precedent = temp->precedent;
+    free(temp);
+    return tete;
+}
+
+void afficher_liste(Etudiant* tete) {
+    while (tete) {
+        printf("id: %d, nom: %s, moyenne: %.2f\n", tete->id, tete->nom, tete->moyenne);
+        tete = tete->suivant;
+    }
+}
+
+Etudiant* derniere_cellule(Etudiant* tete) {
+    if (!tete) return NULL;
+    Etudiant* temp = tete;
+    while (temp->suivant) temp = temp->suivant;
+    return temp;
+}
+
+void afficher_liste_inverse(Etudiant* tete) {
+    Etudiant* temp = derniere_cellule(tete);
+    while (temp) {
+        printf("id: %d, nom: %s, moyenne: %.2f\n", temp->id, temp->nom, temp->moyenne);
+        temp = temp->precedent;
+    }
+}
+
+int chercher_etudiant(Etudiant* tete, int id) {
+    Etudiant* temp = tete;
+    while (temp) {
+        if (temp->id == id) return 1;
+        temp = temp->suivant;
+    }
+    return 0;
+}
+
+Etudiant* tri(Etudiant* tete) {
+    if (!tete) return NULL;
+    int permuté;
+    do {
+        permuté = 0;
+        Etudiant* temp = tete;
+        while (temp->suivant) {
+            if (temp->moyenne > temp->suivant->moyenne) {
+                float m = temp->moyenne;
+                int id = temp->id;
+                char nom[50];
+                strcpy(nom, temp->nom);
+
+                temp->moyenne = temp->suivant->moyenne;
+                temp->id = temp->suivant->id;
+                strcpy(temp->nom, temp->suivant->nom);
+
+                temp->suivant->moyenne = m;
+                temp->suivant->id = id;
+                strcpy(temp->suivant->nom, nom);
+
+                permuté = 1;
+            }
+            temp = temp->suivant;
+        }
+    } while (permuté);
+    return tete;
+}
+
+int main() {
+    return 0;
+}
