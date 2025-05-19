@@ -1,0 +1,197 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+    struct Noeud *precedent;
+} Noeud;
+
+Noeud* cree(int valeur) {
+    Noeud* nouveau = (Noeud*) malloc(sizeof(Noeud));
+    if (!nouveau) return NULL;
+    nouveau->valeur = valeur;
+    nouveau->suivant = NULL;
+    nouveau->precedent = NULL;
+    return nouveau;
+}
+
+Noeud* affiche(Noeud* debut) {
+    Noeud* temp = debut;
+    while (temp) {
+        printf("%d---", temp->valeur);
+        temp = temp->suivant;
+    }
+    printf("\n");
+    return debut;
+}
+
+Noeud* afficheinverse(Noeud* debut) {
+    if (!debut) return NULL;
+    Noeud* temp = debut;
+    while (temp->suivant) temp = temp->suivant;
+    while (temp) {
+        printf("%d---", temp->valeur);
+        temp = temp->precedent;
+    }
+    printf("\n");
+    return debut;
+}
+
+Noeud* ajouterD(Noeud* debut, int valeur) {
+    Noeud* nouveau = cree(valeur);
+    if (debut) {
+        nouveau->suivant = debut;
+        debut->precedent = nouveau;
+    }
+    return nouveau;
+}
+
+Noeud* ajouterF(Noeud* debut, int valeur) {
+    Noeud* nouveau = cree(valeur);
+    if (!debut) return nouveau;
+    Noeud* temp = debut;
+    while (temp->suivant) temp = temp->suivant;
+    temp->suivant = nouveau;
+    nouveau->precedent = temp;
+    return debut;
+}
+
+int taille(Noeud* debut) {
+    int i = 0;
+    while (debut) {
+        i++;
+        debut = debut->suivant;
+    }
+    return i;
+}
+
+Noeud* insertion(Noeud* debut, int pos, int valeur) {
+    if (pos < 1 || pos > taille(debut) + 1) return debut;
+    if (pos == 1) return ajouterD(debut, valeur);
+    Noeud* nouveau = cree(valeur);
+    Noeud* temp = debut;
+    for (int i = 1; i < pos - 1; i++) temp = temp->suivant;
+    nouveau->suivant = temp->suivant;
+    if (temp->suivant) temp->suivant->precedent = nouveau;
+    nouveau->precedent = temp;
+    temp->suivant = nouveau;
+    return debut;
+}
+
+Noeud* rechercher(Noeud* debut, int valeur) {
+    Noeud* temp = debut;
+    while (temp) {
+        if (temp->valeur == valeur) {
+            printf("Valeur %d trouvée\n", valeur);
+            return temp;
+        }
+        temp = temp->suivant;
+    }
+    printf("Valeur %d non trouvée\n", valeur);
+    return NULL;
+}
+
+Noeud* suppressionD(Noeud* debut) {
+    if (!debut) return NULL;
+    Noeud* temp = debut;
+    debut = debut->suivant;
+    if (debut) debut->precedent = NULL;
+    free(temp);
+    return debut;
+}
+
+Noeud* suppressionF(Noeud* debut) {
+    if (!debut) return NULL;
+    Noeud* temp = debut;
+    if (!temp->suivant) {
+        free(temp);
+        return NULL;
+    }
+    while (temp->suivant) temp = temp->suivant;
+    temp->precedent->suivant = NULL;
+    free(temp);
+    return debut;
+}
+
+Noeud* suppressionP(Noeud* debut, int pos) {
+    if (pos < 1 || pos > taille(debut)) return debut;
+    if (pos == 1) return suppressionD(debut);
+    Noeud* temp = debut;
+    for (int i = 1; i < pos; i++) temp = temp->suivant;
+    if (temp->precedent) temp->precedent->suivant = temp->suivant;
+    if (temp->suivant) temp->suivant->precedent = temp->precedent;
+    free(temp);
+    return debut;
+}
+
+Noeud* modifierD(Noeud* debut, int valeur) {
+    if (debut) debut->valeur = valeur;
+    return debut;
+}
+
+Noeud* modifierF(Noeud* debut, int valeur) {
+    if (!debut) return NULL;
+    Noeud* temp = debut;
+    while (temp->suivant) temp = temp->suivant;
+    temp->valeur = valeur;
+    return debut;
+}
+
+Noeud* modifierP(Noeud* debut, int pos, int valeur) {
+    if (pos < 1 || pos > taille(debut)) return debut;
+    Noeud* temp = debut;
+    for (int i = 1; i < pos; i++) temp = temp->suivant;
+    temp->valeur = valeur;
+    return debut;
+}
+
+Noeud* tri(Noeud* debut) {
+    if (!debut) return NULL;
+    int n = taille(debut);
+    for (int i = 0; i < n; i++) {
+        Noeud* temp = debut;
+        while (temp && temp->suivant) {
+            if (temp->valeur > temp->suivant->valeur) {
+                int t = temp->valeur;
+                temp->valeur = temp->suivant->valeur;
+                temp->suivant->valeur = t;
+            }
+            temp = temp->suivant;
+        }
+    }
+    return debut;
+}
+
+int main() {
+    Noeud* liste = NULL;
+    liste = ajouterF(liste, 30);
+    liste = ajouterF(liste, 10);
+    liste = ajouterF(liste, 20);
+    liste = ajouterF(liste, 40);
+    liste = affiche(liste);
+
+    liste = ajouterD(liste, 5);
+    liste = ajouterF(liste, 50);
+    liste = affiche(liste);
+
+    liste = insertion(liste, 3, 15);
+    liste = affiche(liste);
+
+    liste = suppressionD(liste);
+    liste = suppressionF(liste);
+    liste = suppressionP(liste, 2);
+    liste = affiche(liste);
+
+    liste = modifierD(liste, 100);
+    liste = modifierF(liste, 999);
+    liste = modifierP(liste, 3, 777);
+    liste = affiche(liste);
+
+    rechercher(liste, 777);
+
+    liste = tri(liste);
+    liste = affiche(liste);
+
+    return 0;
+}
